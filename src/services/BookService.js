@@ -62,19 +62,20 @@ class BookService {
 }
 
 
-async createBook(name='unnamed', authors = 'unnamed', publishedYear=2024, ISBN='unset', raiting=0) {
+async createBook(name = 'unnamed', authors = 'unnamed', publishedYear = '', ISBN = null, raiting = null) {
   try {
     const colRef = collection(this.db, 'books');
-
-    addDoc(colRef, {
+    
+    const docRef = await addDoc(colRef, {
       name: name,
       authors: authors,
       publishedYear: publishedYear,
       raiting: raiting,
       ISBN: ISBN
-    }).then(()=>{
-      console.log('created');
-    })
+    });
+
+    console.log('Document written with ID: ', docRef.id); // Логирование ID документа
+    return docRef.id; // Возвращаем ID документа
   } catch (error) {
     console.error("Error creating book: ", error);
     return null;

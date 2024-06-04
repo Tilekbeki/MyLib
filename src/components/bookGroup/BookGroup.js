@@ -1,87 +1,39 @@
 import './BookGroup.scss';
 import { Component } from "react";
-import BookService from '../../services/BookService';
+
 class BookGroup extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: {
-                
-            },
-            hover: false,
+            data: this.props.data,
             message:''
         };
-        this.bookService = new BookService();
     }
-    componentDidMount() {
-        this.fetchBooks();
-    }
-    
-  
-    removeBookFromYear = (year, id) => {
+   
+    handleremoveBookFromYear = (year, id) => {
         this.setState(prevState => {
-          const updatedData = { ...prevState.data };
-          updatedData[year] = updatedData[year].filter(book => book.id !== id);
-          if (updatedData[year].length === 0) {
-            delete updatedData[year];
-          }
-          return { data: updatedData };
-        });
+            const updatedData = { ...prevState.data };
+            updatedData[year] = updatedData[year].filter(book => book.id !== id);
+            if (updatedData[year].length === 0) {
+              delete updatedData[year];
+            }
+            return { data: updatedData };
+          });
+    }
+    handleDeleteBook = (year, id) => {
+        this.props.deleteBook(year, id); 
+        this.handleremoveBookFromYear(year,id)
       };
-    deleteBook = (year,id) =>{
-        this.bookService.deleteBook(id);
-        this.removeBookFromYear(year, id);
-    } 
-    transformBooksToFakeData =(books)=> {
-        const fakeData = {};
     
-        books.forEach(book => {
-            let year = book.publishedYear;
-            if (year) {
-                year = year.toString();
-            } else {
-                year = 'Без года'
-            }
-            if (!fakeData[year]) {
-                fakeData[year] = [];
-            }
-            if (book.raiting === undefined || book.raiting === null || book.raiting === '') {
-                book.raiting = 'unset';
-            }
-            
-            book.ISBN = book.ISBN || 'unset';
-            
-
-            const formattedBook = {
-                id: book.id,
-                title: book.name,
-                rating: `${book.raiting}/5`,
-                authors: book.authors.join(', '), 
-                ISBN: book.ISBN || '', 
-            };
-    
-            fakeData[year.toString()].push(formattedBook);
-        });
-    
-        return fakeData;
-    }
-    async fetchBooks() {
-        try {
-            const books = await this.bookService.getBooks();
-            const transformedData = this.transformBooksToFakeData(books);
-            this.setState({data: transformedData})
-            const isEmptyUsingKeys = Object.keys(transformedData).length === 0;
-            if(isEmptyUsingKeys) {
-                this.setState({message:'There are no books'})
-            }  
-        } catch (error) {
-            console.error("Error fetching books: ", error);
-            this.setState({ isLoading: false });
+      shouldComponentUpdate(nextProps) {
+        // Проверяем, изменился ли массив данных
+        if (nextProps.data !== this.props.data) {
+          return true; // Рендерим компонент заново, если данные изменились
         }
-    }
+        return false; // Не рендерим компонент заново, если данные не изменились
+      }
     render() {
         const sortedYears = Object.keys(this.state.data).sort((a, b) => b - a);
-    
         return (
             <div className="book-group">
                 {this.state.message}
@@ -102,7 +54,7 @@ class BookGroup extends Component {
                                 <div className="book-item__ISBN">{book.ISBN}</div>
                                 <button 
                                   className='book-item__delete'
-                                    onClick={() => this.deleteBook(year, book.id)}
+                                    onClick={() => this.handleDeleteBook(year, book.id)}
                                 >
                                     DELETE
                                 </button>
