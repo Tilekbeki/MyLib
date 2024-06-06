@@ -20,6 +20,7 @@ class BookService {
   }
   async getBooks() {
     try {
+      
       const colRef = collection(this.db, 'books');
       const snapshot = await getDocs(colRef);
       const books = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -33,10 +34,11 @@ class BookService {
 
   async getRecommendedBook() {
     try {
+      const nowYear = new Date().getFullYear();
       const colRef = collection(this.db, 'books');
       const snapshot = await getDocs(colRef);
       let books = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      books.filter((book)=>book.publishedYear<=2021);
+      books.filter((book)=>book.publishedYear<=nowYear-3);
        
         let maxRating = 0;
         let booksWithMaxRating = [];

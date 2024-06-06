@@ -28,10 +28,22 @@ class ControlForm extends Component {
         this.setState({ authors: formattedNames });
     }
     handleYearChange = (event) => {
-        this.setState({ selectedYear: event.target.value });
+        this.setState({ selectedYear: event.target.value }, () => {
+            // Обновляем опции года после изменения, если это необходимо
+            this.renderYearsOptions();
+        });
     };
     handleRaitingChange = (event) => {
         this.setState({ selectedRaiting: event.target.value });
+    };
+    
+    // Добавьте эту функцию в класс компонента для рендеринга опций года
+    renderYearsOptions = () => {
+        const years = [];
+        for (let year = 2024; year >= 1800; year--) {
+            years.push(<option key={year} value={year}>{year}</option>);
+        }
+        return years;
     };
 
     handleISBNChange = (event) => {
@@ -99,7 +111,7 @@ class ControlForm extends Component {
                         <div>
                             <p><label htmlFor="year">Published year:</label></p>
                             <p><select name="publishedYear" id="year" value={this.state.selectedYear} onChange={this.handleYearChange}>
-                                <option value={this.state.selectedYear}>choose year</option>
+                                <option value={null}>Choose Year</option>
                                 {years}
                             </select></p>
                         </div>
@@ -107,13 +119,18 @@ class ControlForm extends Component {
                             <p><label htmlFor="Raiting">Raiting:</label></p>
                             <p>
                                 <select name="bookRaiting" id="Raiting" value={this.state.selectedRaiting} onChange={this.handleRaitingChange}>
-                                    <option value={this.state.selectedRaiting} selected>choose rating</option>
+                                <option value={null}>Choose Rating</option>
                                     <option value="0">0</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
                                     <option value="4">4</option>
                                     <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
                                 </select>
                             </p>
                         </div>
